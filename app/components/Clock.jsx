@@ -7,12 +7,10 @@ import Footer from './Footer';
 
 
 /* the main page for the index route of this app */
-class PomodoroClock extends React.Component {
+class Clock extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      sessionTime: 25,
-      breakTime: 5,
       timer: 1500,
       timerLabel: "Session",
       timerOn: false,
@@ -30,55 +28,47 @@ class PomodoroClock extends React.Component {
   };
   
   handleBreakDecrement() {
-    if (this.state.breakTime > 1 && ! this.state.timerOn) {
+    if (this.props.breakTime > 1 && ! this.state.timerOn) {
       (this.state.timerLabel === "Break") ?
-      this.setState({
-        breakTime: this.state.breakTime - 1,
-        timer: this.state.timer - 60
-      }) : 
-      this.setState({
-        breakTime: this.state.breakTime - 1
-      })
+        (this.props.decrementBreak(),
+        this.setState({
+          timer: this.state.timer - 60
+        })) : 
+        this.props.decrementBreak()
     }
   }
   
   handleBreakIncrement() {
-    if (this.state.breakTime < 60 && ! this.state.timerOn) {
+    if (this.props.breakTime < 60 && ! this.state.timerOn) {
       (this.state.timerLabel === "Break") ?
-      this.setState({
-        breakTime: this.state.breakTime + 1,
+        (this.props.incrementBreak(),
+        this.setState({
         timer: this.state.timer + 60
-      }) :
-      this.setState({
-        breakTime: this.state.breakTime + 1
-      })
+        })) :
+        this.props.incrementBreak()
     }
   }
   
   handleSessionDecrement() {
-    if (this.state.sessionTime > 1 && ! this.state.timerOn) {
+    if (this.props.sessionTime > 1 && ! this.state.timerOn) {
       (this.state.timerLabel === "Session") ?
-      this.setState({
-        sessionTime: this.state.sessionTime - 1,
-        timer: this.state.timer - 60
-      }) :
-      this.setState({
-        sessionTime: this.state.sessionTime - 1
-      })
+        (this.props.decrementSession(),
+        this.setState({
+          timer: this.state.timer - 60
+        })) :
+        this.props.decrementSession()
     }
   }
   
   handleSessionIncrement() {
-    if (this.state.sessionTime < 60 && ! this.state.timerOn) {
+    if (this.props.sessionTime < 60 && ! this.state.timerOn) {
       (this.state.timerLabel === "Session") ?
-      this.setState({
-        sessionTime: this.state.sessionTime + 1,
-        timer: this.state.timer + 60
-      }) :
-      this.setState({
-        sessionTime: this.state.sessionTime + 1
-      })
-    }
+        (this.props.incrementSession(),
+        this.setState({
+          timer: this.state.timer + 60
+        })) :
+        this.props.incrementSession()
+        }
   }
   
   decrementTimer() {        
@@ -94,7 +84,7 @@ class PomodoroClock extends React.Component {
   
   resetTimer() {
      var new_label = (this.state.timerLabel === "Session") ? "Break" : "Session";
-     var new_timer = (new_label === "Break") ? this.state.breakTime*60 : this.state.sessionTime*60;
+     var new_timer = (new_label === "Break") ? this.props.breakTime*60 : this.props.sessionTime*60;
     
      this.setState({
         timerLabel: new_label,
@@ -124,12 +114,12 @@ class PomodoroClock extends React.Component {
   handleReset() {
     clearInterval(this.state.intervalID);
     this.setState({
-      sessionTime: 25,
-      breakTime: 5,
       timer: 1500,
       timerOn: false,
       timerLabel: "Session"
     });
+    this.props.resetSession();
+    this.props.resetBreak();
     this.beep.pause();
     this.beep.currentTime = 0;
   }
@@ -141,8 +131,8 @@ class PomodoroClock extends React.Component {
           <h1>Pomodoro Clock</h1>
         </div>
         <div id="settings">
-          <Break time={this.state.breakTime} handleIncrement={this.handleBreakIncrement} handleDecrement={this.handleBreakDecrement} />
-          <Session time={this.state.sessionTime} handleIncrement={this.handleSessionIncrement} handleDecrement={this.handleSessionDecrement} />
+          <Break time={this.props.breakTime} handleIncrement={this.handleBreakIncrement} handleDecrement={this.handleBreakDecrement} />
+          <Session time={this.props.sessionTime} handleIncrement={this.handleSessionIncrement} handleDecrement={this.handleSessionDecrement} />
         </div>
         <Timer timeElapsed={this.state.timer} label={this.state.timerLabel} />
         <audio src="https://s3.eu-central-1.amazonaws.com/80sdrums/ding_dong.mp3" id="beep" ref={(audio) => {this.beep = audio;}} />
@@ -153,4 +143,4 @@ class PomodoroClock extends React.Component {
   }
 };
 
-export default PomodoroClock
+export default Clock;
